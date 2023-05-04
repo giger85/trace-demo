@@ -1,0 +1,13 @@
+server:
+  port: 8902
+spring:
+  application:
+    name: api
+  jackson:
+    serialization:
+      indent-output: true
+management:
+  server:
+    port: 8903
+  tracing:
+    enabled: false

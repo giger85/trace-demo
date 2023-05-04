@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="STDOUT_PATTERN" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{traceId},%X{spanId}] [%thread] %-5level %logger{0} - %msg%n"/>
+        </Console>
+
+        <RollingFile name="FILE_PATTERN">
+            <PatternLayout charset="UTF-8" pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%X{traceId},%X{spanId}] [%X{dt.trace_id},%X{dt.span_id}] [%thread] %-5level %logger{0} - %msg%n"/>
+            <FileName>logs/gateway.log</FileName>
+            <FilePattern>logs/gateway.%d{yyyy-MM-dd'T'HH}.%i.log</FilePattern>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="128MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="FILE_JSON">
+            <!-- Suppose that all characters are ascii, then maxStringLength is 1024 * 1024 = 1048576 (1MB) -->
+            <JsonTemplateLayout maxStringLength="1048576" eventTemplateUri="classpath:JsonLogTemplate.json"/>
+            <FileName>logs/gateway-json.log</FileName>
+            <FilePattern>logs/gateway-json.log.%d{yyyy-MM-dd'T'HH}.%i.log</FilePattern>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="128MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${FILE_DIRECTORY}" maxDepth="1">
+                    <IfAccumulatedFileCount exceeds="10">
+                        <IfAny>
+                            <IfLastModified age="P7D" />
+                            <IfAccumulatedFileSize exceeds="100GB" />
+                        </IfAny>
+                    </IfAccumulatedFileCount>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="STDOUT_PATTERN"/>
+            <AppenderRef ref="FILE_PATTERN"/>
+            <AppenderRef ref="FILE_JSON"/>
+        </Root>
+    </Loggers>
+</Configuration>
